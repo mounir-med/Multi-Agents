@@ -1,0 +1,16 @@
+Compte rendu d’hospitalisation
+
+Patient : Youssef Karim
+Durée : 5 jours
+
+Motif :
+Infection pulmonaire aiguë
+
+Traitement :
+Antibiotiques IV
+
+Évolution :
+Amélioration progressive
+
+Sortie :
+Patient stable avec prescription antibiotique orale.

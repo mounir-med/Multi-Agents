@@ -1,0 +1,24 @@
+Rapport Consultation Générale 
+Nom Patient : Ahmed Benali 
+Âge : 45 ans 
+Sexe : Masculin 
+Date Consultation : 12/03/2026 
+Médecin : Dr. Karim El Mansouri 
+Motif de consultation 
+Fatigue persistante depuis 3 semaines, maux de tête fréquents et légère douleur thoracique. 
+Symptômes observés 
+• Fatigue chronique  
+• Difficulté respiratoire légère  
+• Céphalées  
+• Palpitations occasionnelles  
+Antécédents médicaux 
+• Hypertension artérielle  
+• Cholestérol élevé  
+• Antécédent familial de diabète  
+Diagnostic préliminaire 
+Suspicion d’hypertension mal contrôlée avec risque cardiovasculaire modéré. 
+Recommandations 
+• Réaliser ECG  
+• Analyse sanguine complète  
+• Réduction du sel  
+• Surveillance tensionnelle
