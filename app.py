@@ -55,23 +55,28 @@ async def ask_stream(question: str, document_filter: str = ""):
         }
         
         try:
+            # On envoie immédiatement la première étape car LangGraph ne yield qu'après la fin d'un noeud
+            yield f"data: {json.dumps({'node': 'retrieval', 'status': 'running'})}\n\n"
+            
             final_state = initial_state
             for output in workflow.stream(initial_state):
                 for node_name, state_delta in output.items():
                     final_state.update(state_delta)
                     
-                    step_map = {
-                        "retrieval_agent": "retrieval",
-                        "analysis_agent": "analysis",
-                        "report_agent": "report",
-                        "validation_agent": "validation"
+                    # Mapping pour l'étape suivante (Predictive UI)
+                    next_step_map = {
+                        "retrieval_agent": "analysis",
+                        "analysis_agent": "report",
+                        "report_agent": "validation",
+                        "validation_agent": "complete"
                     }
-                    ui_node = step_map.get(node_name, node_name)
                     
-                    # On envoie aussi les données partielles pour l'affichage progressif
+                    next_node = next_step_map.get(node_name, "complete")
+                    
+                    # On envoie le résultat de l'étape finie ET on prévient que la suivante commence
                     payload = {
-                        'node': ui_node, 
-                        'status': 'complete',
+                        'node': next_node, 
+                        'status': 'running',
                         'data': state_delta.get('analysis') or state_delta.get('report') or state_delta.get('retrieved_context')
                     }
                     yield f"data: {json.dumps(payload)}\n\n"
@@ -106,13 +111,38 @@ def list_files():
     files = [f for f in os.listdir(DATA_DIR) if os.path.isfile(os.path.join(DATA_DIR, f))]
     return {"files": files}
 
+@app.get("/api/surveillance")
+def get_surveillance():
+    print(f"Audit de surveillance lancé sur : {DATA_DIR}")
+    if not os.path.exists(DATA_DIR): 
+        print("Erreur : Dossier DATA_DIR introuvable")
+        return {"analyses": []}
+    
+    files = [f for f in os.listdir(DATA_DIR) if os.path.isfile(os.path.join(DATA_DIR, f))]
+    print(f"Fichiers trouvés : {len(files)}")
+    
+    analyses = []
+    for i, f in enumerate(files):
+        # On simule des métadonnées d'audit basées sur le type de fichier
+        status = "Critique" if "urgent" in f.lower() or "rapport" in f.lower() else "Validé"
+        score = 85 + (i % 15) 
+        analyses.append({
+            "id": i + 1,
+            "patient": f,
+            "date": "16/05/2026",
+            "status": status,
+            "score": score,
+            "alerts": 1 if status == "Critique" else 0
+        })
+    return {"analyses": analyses}
+
 @app.delete("/api/delete/{filename}")
 def delete_file(filename: str):
     file_path = os.path.join(DATA_DIR, filename)
     if os.path.exists(file_path):
         os.remove(file_path)
         return {"status": "success", "message": f"File {filename} deleted"}
-    return {"status": "error", "message": "File not found"}, 404
+    return {"status": "error", "message": "File not found"}
 
 @app.get("/api/health")
 def health_check():
